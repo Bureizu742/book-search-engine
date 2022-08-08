@@ -2,15 +2,15 @@
 import React, { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 
-import { useMutation } from '@apollo/react-hooks';
-import { LOGIN_USER } from '../utils/mutations';
+import { LOGIN_USER } from '../utils/mutations'
 import Auth from '../utils/auth';
+import { useMutation } from '@apollo/client';
 
 const LoginForm = () => {
   const [userFormData, setUserFormData] = useState({ email: '', password: '' });
   const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-  const [loginUser] = useMutation(LOGIN_USER);
+  const [loginUser, { error }] = useMutation(LOGIN_USER);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -29,10 +29,11 @@ const LoginForm = () => {
 
     try {
       const { data } = await loginUser({
-        variables: { ...userFormData }
+        variables: { ...userFormData },
       });
 
-      Auth.login(data.login.token);
+      Auth.login(data.login.token)
+      
     } catch (err) {
       console.error(err);
       setShowAlert(true);
@@ -63,7 +64,7 @@ const LoginForm = () => {
           />
           <Form.Control.Feedback type='invalid'>Email is required!</Form.Control.Feedback>
         </Form.Group>
-  
+
         <Form.Group>
           <Form.Label htmlFor='password'>Password</Form.Label>
           <Form.Control
@@ -83,6 +84,7 @@ const LoginForm = () => {
           Submit
         </Button>
       </Form>
+      {error && <div>Login failed</div>}
     </>
   );
 };
